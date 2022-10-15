@@ -7,8 +7,8 @@ import (
 )
 
 type Client struct {
-	host       string
-	httpClient *http.Client
+	Host       string
+	HTTPClient *http.Client
 }
 type successResponse struct {
 	Code int `json:"code"`
@@ -22,10 +22,10 @@ type errorResponse struct {
 func NewClient() *Client {
 	host := os.Getenv("API_HOST")
 	client := &http.Client{
-		Timeout: time.Minute
+		Timeout: time.Minute,
 	}
     return &Client{
-        BaseURL: host,
-        HTTPClient: client
+        Host: host,
+        HTTPClient: client,
     }
 }
