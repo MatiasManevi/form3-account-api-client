@@ -1,7 +1,7 @@
 package form3Client
 
 type AccountRequest struct {
-	data *AccountData `json:"data"`
+	Data *AccountData `json:"data"`
 }
 
 type AccountData struct {
