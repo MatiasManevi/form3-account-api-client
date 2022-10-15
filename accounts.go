@@ -1,5 +1,9 @@
 package form3Client
 
+type AccountRequest struct {
+	data *AccountData `json:"data"`
+}
+
 type AccountData struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
 	ID             string             `json:"id,omitempty"`
