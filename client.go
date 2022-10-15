@@ -11,12 +11,11 @@ type Client struct {
 	HTTPClient *http.Client
 }
 type successResponse struct {
-	Code int `json:"code"`
 	Data interface{} `json:"data"`
+	Links interface{} `json:"links"`
 }
 type errorResponse struct {
-	Code int `json:"code"`
-	Message string `json:"message"`
+	ErrorMessage string `json:"error_message"`
 }
 
 func NewClient() *Client {
