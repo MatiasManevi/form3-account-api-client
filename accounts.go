@@ -1,10 +1,24 @@
 package form3Client
 
+import (
+	"net/http"
+	"fmt"
+)
+
+const (
+	endpoint = "organisation/accounts"
+)
+
 type AccountRequest struct {
-	Data *AccountData `json:"data"`
+	Data Account `json:"data"`
 }
 
-type AccountData struct {
+type AccountResponse struct {
+	Data Account `json:"data"`
+	Links interface{} `json:"links"`
+}
+
+type Account struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
 	ID             string             `json:"id,omitempty"`
 	OrganisationID string             `json:"organisation_id,omitempty"`
@@ -29,3 +43,15 @@ type AccountAttributes struct {
 	Status                  *string  `json:"status,omitempty"`
 	Switched                *bool    `json:"switched,omitempty"`
 }
+
+func (c *Client) GetAccount(id string) (*Account, error) {
+	res := Account{}
+	err := c.doRequest(http.MethodGet, fmt.Sprintf(endpoint+"/%s", id), &res, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+   
