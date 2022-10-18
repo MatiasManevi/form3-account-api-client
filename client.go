@@ -11,7 +11,7 @@ import (
 
 const (
 	// Points to form3 account API
-	Host = "http://localhost:8080/v1/"
+	Host = "http://localhost:8080/v1"
 
 	// Used to limit http.Client waiting time.
 	httpClientTimeout = 30 * time.Second
