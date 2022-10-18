@@ -7,42 +7,41 @@ import (
 	"encoding/json"
 	"errors"
 	"context"
-	"io"
+)
+
+const (
+	// Points to form3 account API
+	Host = "http://localhost:8080/v1/"
+
+	// Used to limit http.Client waiting time.
+	httpClientTimeout = 30 * time.Second
 )
 
 type Client struct {
 	Host       string
 	HTTPClient *http.Client
 }
+
 type successResponse struct {
 	Data interface{} `json:"data"`
 	Links interface{} `json:"links"`
 }
+
 type errorResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
 
 func NewClient() *Client {
-	// host := os.Getenv("API_HOST")
-	host := "http://localhost:8080/v1/"
 	client := &http.Client{
-		Timeout: time.Minute,
+		Timeout: httpClientTimeout,
 	}
     return &Client{
-        Host: host,
+        Host: Host,
         HTTPClient: client,
     }
 }
 
-func (c *Client) doRequest(method, endpoint string, v interface{}, data io.Reader) error {
-	// HTTP request creation
-	baseURL := fmt.Sprintf("%s/%s", c.Host, endpoint)
-	req, err := http.NewRequest(method, baseURL, data)
-	// Handle HTTP request creation errors
-	if err != nil {
-        return err
-    }
-
+func (c *Client) doRequest(req *http.Request, v interface{}) error {
 	// Use context on request to control reuqest deadline
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -71,14 +70,16 @@ func (c *Client) doRequest(method, endpoint string, v interface{}, data io.Reade
 		return errors.New(errRes.ErrorMessage)
     }
 
-    response := successResponse{
-        Data: v,
-    }
-
-	// Checking for errors in response decoding
-    if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
-        return err
-    }
+	if v != nil {
+		response := successResponse{
+			Data: v,
+		}
+		
+		// Checking for errors in response decoding
+		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
+			return err
+		}
+	}
 	
 	return nil
 }
