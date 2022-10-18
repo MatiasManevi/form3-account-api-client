@@ -3,20 +3,13 @@ package form3Client
 import (
 	"net/http"
 	"fmt"
+	"encoding/json"
+	"bytes"
 )
 
 const (
-	endpoint = "organisation/accounts"
+	Endpoint = "organisation/accounts"
 )
-
-type AccountRequest struct {
-	Data Account `json:"data"`
-}
-
-type AccountResponse struct {
-	Data Account `json:"data"`
-	Links interface{} `json:"links"`
-}
 
 type Account struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
@@ -45,8 +38,16 @@ type AccountAttributes struct {
 }
 
 func (c *Client) GetAccount(id string) (*Account, error) {
+	url := fmt.Sprintf("%s/%s/%s", c.Host, Endpoint, id)
+	// HTTP request creation
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	// Handle HTTP request creation errors
+	if err != nil {
+		return nil, err
+	}
+
 	res := Account{}
-	err := c.doRequest(http.MethodGet, fmt.Sprintf(endpoint+"/%s", id), &res, nil)
+	err = c.doRequest(req, &res)
 
 	if err != nil {
 		return nil, err
@@ -54,4 +55,45 @@ func (c *Client) GetAccount(id string) (*Account, error) {
 
 	return &res, nil
 }
-   
+
+func (c *Client) CreateAccount(account Account) (*Account, error) {
+	data, err := json.Marshal(account)
+	if err != nil {
+		return nil, err
+	}
+
+	url := fmt.Sprintf("%s/%s", c.Host, Endpoint)	
+	// HTTP request creation
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
+	// Handle HTTP request creation errors
+	if err != nil {
+		return nil, err
+	}
+	
+	res := Account{}
+	err = c.doRequest(req, &res)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (c *Client) DeleteAccount(id string) (error) {
+	url := fmt.Sprintf("%s/%s/%s", c.Host, Endpoint, id)
+	// HTTP request creation
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	// Handle HTTP request creation errors
+	if err != nil {
+		return err
+	}
+
+	err = c.doRequest(req, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
