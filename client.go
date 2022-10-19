@@ -60,25 +60,33 @@ func (c *Client) doRequest(req *http.Request, v interface{}) error {
     defer res.Body.Close()
 
 	// Checking for errors in response status code
-    if res.StatusCode != http.StatusOK {
-        var errRes errorResponse
-        if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
-			// Error response couldn't be decoded
-			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
-		}
-		
-		return errors.New(errRes.ErrorMessage)
-    }
-
-	if v != nil {
+	switch res.StatusCode {
+	case http.StatusOK, http.StatusCreated:
+		// Status codes 200 and 201 returned for successful GET-POST requests
 		response := successResponse{
 			Data: v,
 		}
-		
+	
 		// Checking for errors in response decoding
 		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
 			return err
 		}
+	case http.StatusNoContent:
+		// Status code 204 returned for successful DELETE requests
+		return nil
+	case http.StatusInternalServerError:
+		// Status code 500 is a server error
+		return errors.New("the Accounts API is currently unavailable")
+	default:
+		// Anything else than a 200/201/204/500
+		var errRes errorResponse
+        if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
+			// Error response couldn't be decoded
+			fmt.Println("Error response couldn't be decoded")
+			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
+		}
+		
+		return errors.New(errRes.ErrorMessage)
 	}
 	
 	return nil
