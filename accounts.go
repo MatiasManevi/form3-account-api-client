@@ -8,15 +8,22 @@ import (
 )
 
 const (
+	// Points to form3 account API accounts endpoint
 	Endpoint = "organisation/accounts"
+
+	// Version of created accounts used on deletion
+	AccountVersion = "0"
 )
+
+type NewAccountRequest struct {
+	Data Account `json:"data"`
+}
 
 type Account struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
 	ID             string             `json:"id,omitempty"`
 	OrganisationID string             `json:"organisation_id,omitempty"`
 	Type           string             `json:"type,omitempty"`
-	Version        *int64             `json:"version,omitempty"`
 }
 
 type AccountAttributes struct {
@@ -39,9 +46,7 @@ type AccountAttributes struct {
 
 func (c *Client) GetAccount(id string) (*Account, error) {
 	url := fmt.Sprintf("%s/%s/%s", c.Host, Endpoint, id)
-	// HTTP request creation
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	// Handle HTTP request creation errors
+	req, err := buildRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -56,16 +61,19 @@ func (c *Client) GetAccount(id string) (*Account, error) {
 	return &res, nil
 }
 
-func (c *Client) CreateAccount(account *Account) (*Account, error) {
-	data, err := json.Marshal(account)
+func (c *Client) CreateAccount(account Account) (*Account, error) {
+	newAccountReq := NewAccountRequest{
+		Data: account,
+	}
+
+	// Converting go struct into []byte
+	data, err := json.Marshal(newAccountReq)
 	if err != nil {
 		return nil, err
 	}
 
 	url := fmt.Sprintf("%s/%s", c.Host, Endpoint)	
-	// HTTP request creation
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
-	// Handle HTTP request creation errors
+	req, err := buildRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -80,11 +88,9 @@ func (c *Client) CreateAccount(account *Account) (*Account, error) {
 	return &res, nil
 }
 
-func (c *Client) DeleteAccount(id string) (error) {
-	url := fmt.Sprintf("%s/%s/%s", c.Host, Endpoint, id)
-	// HTTP request creation
-	req, err := http.NewRequest(http.MethodDelete, url, nil)
-	// Handle HTTP request creation errors
+func (c *Client) DeleteAccount(id string) error {
+	url := fmt.Sprintf("%s/%s/%s?version=%s", c.Host, Endpoint, id, AccountVersion)
+	req, err := buildRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		return err
 	}
