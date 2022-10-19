@@ -67,7 +67,7 @@ func (c *Client) doRequest(req *http.Request, v interface{}) error {
 			Data: v,
 		}
 	
-		// Checking for errors in response decoding
+		// Checking for errors in response decoding data into go struct
 		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
 			return err
 		}
