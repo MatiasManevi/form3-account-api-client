@@ -82,7 +82,6 @@ func (c *Client) doRequest(req *http.Request, v interface{}) error {
 		var errRes errorResponse
         if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
 			// Error response couldn't be decoded
-			fmt.Println("Error response couldn't be decoded")
 			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
 		}
 		
