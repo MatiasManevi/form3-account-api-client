@@ -24,7 +24,7 @@ func TestCreateAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient().CreateAccount(NewAccount)
+	account, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.Nil(t, err, "expecting nil error")
 	assert.NotNil(t, account, "expecting non-nil result")
@@ -39,7 +39,7 @@ func TestGetAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient().GetAccount(acc.ID)
+	account, err := NewClient(nil).GetAccount(acc.ID)
 
 	assert.Nil(t, err, "expecting nil error")
 	assert.NotNil(t, account, "expecting non-nil result")
@@ -54,7 +54,7 @@ func TestDeleteAccount(t *testing.T) {
         panic(err)
     }
 	
-	err = NewClient().DeleteAccount(acc.ID)
+	err = NewClient(nil).DeleteAccount(acc.ID)
 
 	assert.Nil(t, err, "expecting nil error")
 	assert.NotNil(t, acc, "expecting non-nil result")
@@ -62,7 +62,7 @@ func TestDeleteAccount(t *testing.T) {
 
 func TestAccountDuplicatedError(t *testing.T) {
 	file := fixture("account_2.json")
-	client := NewClient();
+	client := NewClient(nil);
 
 	NewAccount := Account{}
 	err := json.Unmarshal([]byte(file), &NewAccount)
@@ -87,7 +87,7 @@ func TestInvalidDataOnCreateAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient().CreateAccount(NewAccount)
+	account, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.NotNil(t, err, "expecting non-nil error")
 	assert.Nil(t, account, "expecting nil result")
@@ -95,7 +95,7 @@ func TestInvalidDataOnCreateAccount(t *testing.T) {
 }
 
 func TestGetAccountNotFound(t *testing.T) {
-	account, err := NewClient().GetAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
+	account, err := NewClient(nil).GetAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
 
 	assert.NotNil(t, err, "expecting non-nil error")
 	assert.Nil(t, account, "expecting nil result")
@@ -103,7 +103,7 @@ func TestGetAccountNotFound(t *testing.T) {
 }
 
 func TestGetAccountInvalidUUID(t *testing.T) {
-	account, err := NewClient().GetAccount("non-uuid-string")
+	account, err := NewClient(nil).GetAccount("non-uuid-string")
 
 	assert.NotNil(t, err, "expecting non-nil error")
 	assert.Nil(t, account, "expecting nil result")
@@ -111,7 +111,7 @@ func TestGetAccountInvalidUUID(t *testing.T) {
 }
 
 func TestUnkownErrorOnDeleteUnexistentAccount(t *testing.T) {
-	err := NewClient().DeleteAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
+	err := NewClient(nil).DeleteAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
 
 	assert.NotNil(t, err, "expecting non-nil error")
 	assert.Equal(t, err.Error(), "unknown error, status code: 404", "expecting unkown error when trying to delete an account that does not exists")

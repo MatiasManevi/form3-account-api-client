@@ -31,12 +31,25 @@ type errorResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
 
-func NewClient() *Client {
+type ClientOptions struct {
+	Host string
+	Timeout time.Duration
+}
+
+func NewClient(options *ClientOptions) *Client {
+	host := Host
+	timeout := httpClientTimeout
+
+	if options != nil {
+		host = options.Host
+		timeout = options.Timeout
+	}
+	
 	client := &http.Client{
-		Timeout: httpClientTimeout,
+		Timeout: timeout,
 	}
     return &Client{
-        Host: Host,
+        Host: host,
         HTTPClient: client,
     }
 }
@@ -47,9 +60,9 @@ func (c *Client) doRequest(req *http.Request, v interface{}) error {
 	defer cancel()
 	req = req.WithContext(ctx)
 
-	// Setting common headers
-    req.Header.Set("Content-Type", "application/json; charset=utf-8")
-    req.Header.Set("Accept", "application/json; charset=utf-8")
+    // Setting common headers
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Accept", "application/json; charset=utf-8")
 
 	// Run request
 	res, err := c.HTTPClient.Do(req)
