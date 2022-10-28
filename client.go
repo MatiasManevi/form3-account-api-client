@@ -1,6 +1,7 @@
 package form3Client
 
 import (
+    "os"
     "net/http"
     "time"
     "fmt"
@@ -9,22 +10,9 @@ import (
 	"context"
 )
 
-const (
-	// Points to form3 account API
-	Host = "http://localhost:8080/v1"
-
-	// Used to limit http.Client waiting time.
-	httpClientTimeout = 30 * time.Second
-)
-
 type Client struct {
 	Host       string
 	HTTPClient *http.Client
-}
-
-type successResponse struct {
-	Data interface{} `json:"data"`
-	Links interface{} `json:"links"`
 }
 
 type errorResponse struct {
@@ -37,8 +25,10 @@ type ClientOptions struct {
 }
 
 func NewClient(options *ClientOptions) *Client {
-	host := Host
-	timeout := httpClientTimeout
+	// Points to form3 account API
+	host := os.Getenv("API_HOST")
+	// Used to limit http.Client waiting time.
+	timeout := 30 * time.Second
 
 	if options != nil {
 		host = options.Host
@@ -54,7 +44,7 @@ func NewClient(options *ClientOptions) *Client {
     }
 }
 
-func (c *Client) doRequest(req *http.Request, v interface{}) error {
+func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 	// Use context on request to control reuqest deadline
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -76,9 +66,7 @@ func (c *Client) doRequest(req *http.Request, v interface{}) error {
 	switch res.StatusCode {
 	case http.StatusOK, http.StatusCreated:
 		// Status codes 200 and 201 returned for successful GET-POST requests
-		response := successResponse{
-			Data: v,
-		}
+		response := Response
 	
 		// Checking for errors in response decoding data into go struct
 		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
