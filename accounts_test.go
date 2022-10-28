@@ -24,10 +24,10 @@ func TestCreateAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient(nil).CreateAccount(NewAccount)
+	response, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.Nil(t, err, "expecting nil error")
-	assert.NotNil(t, account, "expecting non-nil result")
+	assert.NotNil(t, response.Data.ID, "expecting non-nil result")
 }
 
 func TestGetAccount(t *testing.T) {
@@ -39,10 +39,10 @@ func TestGetAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient(nil).GetAccount(acc.ID)
+	response, err := NewClient(nil).GetAccount(acc.ID)
 
 	assert.Nil(t, err, "expecting nil error")
-	assert.NotNil(t, account, "expecting non-nil result")
+	assert.NotNil(t, response.Data.ID, "expecting non-nil result")
 }
 
 func TestDeleteAccount(t *testing.T) {
@@ -71,9 +71,9 @@ func TestAccountDuplicatedError(t *testing.T) {
     }
 	
 	client.CreateAccount(NewAccount)
-	account, err := client.CreateAccount(NewAccount)
+	response, err := client.CreateAccount(NewAccount)
 
-	assert.Nil(t, account, "expecting nil result")
+	assert.Nil(t, response, "expecting nil result")
 	assert.NotNil(t, err, "expecting non-nil error")
 	assert.Equal(t, err.Error(), "Account cannot be created as it violates a duplicate constraint", "expecting duplicate constraint violation message")
 }
@@ -87,26 +87,26 @@ func TestInvalidDataOnCreateAccount(t *testing.T) {
         panic(err)
     }
 	
-	account, err := NewClient(nil).CreateAccount(NewAccount)
+	response, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.NotNil(t, err, "expecting non-nil error")
-	assert.Nil(t, account, "expecting nil result")
+	assert.Nil(t, response, "expecting nil result")
 	assert.Equal(t, err.Error(), "validation failure list:\nvalidation failure list:\nattributes in body is required\ntype in body is required", "expecting validation failure due to incomplete request payload")
 }
 
 func TestGetAccountNotFound(t *testing.T) {
-	account, err := NewClient(nil).GetAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
+	response, err := NewClient(nil).GetAccount("1d209d7f-d07a-4542-947f-5885fddddaa2")
 
 	assert.NotNil(t, err, "expecting non-nil error")
-	assert.Nil(t, account, "expecting nil result")
+	assert.Nil(t, response, "expecting nil result")
 	assert.Equal(t, err.Error(), "record 1d209d7f-d07a-4542-947f-5885fddddaa2 does not exist", "expecting not found account error")
 }
 
 func TestGetAccountInvalidUUID(t *testing.T) {
-	account, err := NewClient(nil).GetAccount("non-uuid-string")
+	response, err := NewClient(nil).GetAccount("non-uuid-string")
 
 	assert.NotNil(t, err, "expecting non-nil error")
-	assert.Nil(t, account, "expecting nil result")
+	assert.Nil(t, response, "expecting nil result")
 	assert.Equal(t, err.Error(), "id is not a valid uuid", "expecting invalid uuid id when trying to get an account")
 }
 

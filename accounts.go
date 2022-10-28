@@ -19,6 +19,11 @@ type NewAccountRequest struct {
 	Data Account `json:"data"`
 }
 
+type AccountResponse struct {
+	Data Account `json:"data"`
+	Links interface{} `json:"links"`
+}
+
 type Account struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
 	ID             string             `json:"id,omitempty"`
@@ -44,14 +49,14 @@ type AccountAttributes struct {
 	Switched                *bool    `json:"switched,omitempty"`
 }
 
-func (c *Client) GetAccount(id string) (*Account, error) {
+func (c *Client) GetAccount(id string) (*AccountResponse, error) {
 	url := fmt.Sprintf("%s/%s/%s", c.Host, Endpoint, id)
 	req, err := buildRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res := Account{}
+	res := AccountResponse{}
 	err = c.doRequest(req, &res)
 
 	if err != nil {
@@ -61,7 +66,7 @@ func (c *Client) GetAccount(id string) (*Account, error) {
 	return &res, nil
 }
 
-func (c *Client) CreateAccount(account Account) (*Account, error) {
+func (c *Client) CreateAccount(account Account) (*AccountResponse, error) {
 	newAccountReq := NewAccountRequest{
 		Data: account,
 	}
@@ -78,9 +83,10 @@ func (c *Client) CreateAccount(account Account) (*Account, error) {
 		return nil, err
 	}
 	
-	res := Account{}
+	res := AccountResponse{}
+	
 	err = c.doRequest(req, &res)
-
+	
 	if err != nil {
 		return nil, err
 	}
