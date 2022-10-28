@@ -1,10 +1,10 @@
 package form3Client
 
 import (
-	"net/http"
-	"fmt"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 )
 
 const (
@@ -20,7 +20,7 @@ type NewAccountRequest struct {
 }
 
 type AccountResponse struct {
-	Data Account `json:"data"`
+	Data  Account     `json:"data"`
 	Links interface{} `json:"links"`
 }
 
@@ -77,16 +77,16 @@ func (c *Client) CreateAccount(account Account) (*AccountResponse, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/%s", c.Host, Endpoint)	
+	url := fmt.Sprintf("%s/%s", c.Host, Endpoint)
 	req, err := buildRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
-	
+
 	res := AccountResponse{}
-	
+
 	err = c.doRequest(req, &res)
-	
+
 	if err != nil {
 		return nil, err
 	}

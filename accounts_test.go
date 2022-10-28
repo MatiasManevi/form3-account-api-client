@@ -1,18 +1,18 @@
 package form3Client
 
 import (
-	"testing"
 	"encoding/json"
-	"io/ioutil"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"testing"
 )
 
 func fixture(path string) string {
-    data, err := ioutil.ReadFile("testdata/" + path)
-    if err != nil {
-        panic(err)
-    }
-    return string(data)
+	data, err := ioutil.ReadFile("testdata/" + path)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }
 
 func TestCreateAccount(t *testing.T) {
@@ -21,9 +21,9 @@ func TestCreateAccount(t *testing.T) {
 	NewAccount := Account{}
 	err := json.Unmarshal([]byte(file), &NewAccount)
 	if err != nil {
-        panic(err)
-    }
-	
+		panic(err)
+	}
+
 	response, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.Nil(t, err, "expecting nil error")
@@ -36,9 +36,9 @@ func TestGetAccount(t *testing.T) {
 	acc := Account{}
 	err := json.Unmarshal([]byte(file), &acc)
 	if err != nil {
-        panic(err)
-    }
-	
+		panic(err)
+	}
+
 	response, err := NewClient(nil).GetAccount(acc.ID)
 
 	assert.Nil(t, err, "expecting nil error")
@@ -51,9 +51,9 @@ func TestDeleteAccount(t *testing.T) {
 	acc := Account{}
 	err := json.Unmarshal([]byte(file), &acc)
 	if err != nil {
-        panic(err)
-    }
-	
+		panic(err)
+	}
+
 	err = NewClient(nil).DeleteAccount(acc.ID)
 
 	assert.Nil(t, err, "expecting nil error")
@@ -62,14 +62,14 @@ func TestDeleteAccount(t *testing.T) {
 
 func TestAccountDuplicatedError(t *testing.T) {
 	file := fixture("account_2.json")
-	client := NewClient(nil);
+	client := NewClient(nil)
 
 	NewAccount := Account{}
 	err := json.Unmarshal([]byte(file), &NewAccount)
 	if err != nil {
-        panic(err)
-    }
-	
+		panic(err)
+	}
+
 	client.CreateAccount(NewAccount)
 	response, err := client.CreateAccount(NewAccount)
 
@@ -84,9 +84,9 @@ func TestInvalidDataOnCreateAccount(t *testing.T) {
 	NewAccount := Account{}
 	err := json.Unmarshal([]byte(file), &NewAccount)
 	if err != nil {
-        panic(err)
-    }
-	
+		panic(err)
+	}
+
 	response, err := NewClient(nil).CreateAccount(NewAccount)
 
 	assert.NotNil(t, err, "expecting non-nil error")

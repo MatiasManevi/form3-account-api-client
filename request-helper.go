@@ -1,9 +1,9 @@
 package form3Client
 
 import (
-    "net/url"
-    "net/http"
-    "io"
+	"io"
+	"net/http"
+	"net/url"
 )
 
 func buildRequest(method string, path string, data io.Reader) (*http.Request, error) {
@@ -15,10 +15,10 @@ func buildRequest(method string, path string, data io.Reader) (*http.Request, er
 
 	// Creates request
 	req, err := http.NewRequest(method, uri.String(), data)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return req, nil
 }

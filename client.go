@@ -1,13 +1,13 @@
 package form3Client
 
 import (
-    "os"
-    "net/http"
-    "time"
-    "fmt"
+	"context"
 	"encoding/json"
 	"errors"
-	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"time"
 )
 
 type Client struct {
@@ -20,7 +20,7 @@ type errorResponse struct {
 }
 
 type ClientOptions struct {
-	Host string
+	Host    string
 	Timeout time.Duration
 }
 
@@ -34,14 +34,14 @@ func NewClient(options *ClientOptions) *Client {
 		host = options.Host
 		timeout = options.Timeout
 	}
-	
+
 	client := &http.Client{
 		Timeout: timeout,
 	}
-    return &Client{
-        Host: host,
-        HTTPClient: client,
-    }
+	return &Client{
+		Host:       host,
+		HTTPClient: client,
+	}
 }
 
 func (c *Client) doRequest(req *http.Request, Response interface{}) error {
@@ -50,24 +50,24 @@ func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 	defer cancel()
 	req = req.WithContext(ctx)
 
-    // Setting common headers
+	// Setting common headers
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 
 	// Run request
 	res, err := c.HTTPClient.Do(req)
 	// Handle HTTP request errors
-    if err != nil {
-        return err
-    }
-    defer res.Body.Close()
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
 
 	// Checking for errors in response status code
 	switch res.StatusCode {
 	case http.StatusOK, http.StatusCreated:
 		// Status codes 200 and 201 returned for successful GET-POST requests
 		response := Response
-	
+
 		// Checking for errors in response decoding data into go struct
 		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
 			return err
@@ -77,17 +77,17 @@ func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 		return nil
 	case http.StatusInternalServerError:
 		// Status code 500 is a server error
-		return errors.New("the Accounts API is currently unavailable")
+		return errors.New("The API service is currently unavailable")
 	default:
 		// Anything else than a 200/201/204/500
 		var errRes errorResponse
-        if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
+		if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
 			// Error response couldn't be decoded
 			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
 		}
-		
+
 		return errors.New(errRes.ErrorMessage)
 	}
-	
+
 	return nil
 }
