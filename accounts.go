@@ -84,7 +84,6 @@ func (c *Client) CreateAccount(account Account) (*AccountResponse, error) {
 	}
 
 	res := AccountResponse{}
-
 	err = c.doRequest(req, &res)
 
 	if err != nil {
