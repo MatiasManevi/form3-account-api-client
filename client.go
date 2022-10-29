@@ -66,10 +66,9 @@ func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 	switch res.StatusCode {
 	case http.StatusOK, http.StatusCreated:
 		// Status codes 200 and 201 returned for successful GET-POST requests
-		response := Response
 
 		// Checking for errors in response decoding data into go struct
-		if err = json.NewDecoder(res.Body).Decode(&response); err != nil {
+		if err = json.NewDecoder(res.Body).Decode(Response); err != nil {
 			return err
 		}
 	case http.StatusNoContent:
@@ -80,7 +79,7 @@ func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 		return errors.New("The API service is currently unavailable")
 	default:
 		// Anything else than a 200/201/204/500
-		var errRes errorResponse
+		errRes := errorResponse{}
 		if err = json.NewDecoder(res.Body).Decode(&errRes); err != nil {
 			// Error response couldn't be decoded
 			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
