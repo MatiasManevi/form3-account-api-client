@@ -38,13 +38,14 @@ func NewClient(options *ClientOptions) *Client {
 	client := &http.Client{
 		Timeout: timeout,
 	}
+
 	return &Client{
 		Host:       host,
 		HTTPClient: client,
 	}
 }
 
-func (c *Client) doRequest(req *http.Request, Response interface{}) error {
+func (c *Client) doRequest(req *http.Request, response interface{}) error {
 	// Use context on request to control reuqest deadline
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -68,7 +69,7 @@ func (c *Client) doRequest(req *http.Request, Response interface{}) error {
 		// Status codes 200 and 201 returned for successful GET-POST requests
 
 		// Checking for errors in response decoding data into go struct
-		if err = json.NewDecoder(res.Body).Decode(Response); err != nil {
+		if err = json.NewDecoder(res.Body).Decode(response); err != nil {
 			return err
 		}
 	case http.StatusNoContent:
